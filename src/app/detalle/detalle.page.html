@@ -1,0 +1,74 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Gasto</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  @if (gasto) {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ gasto.departamento }}</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-list lines="full">
+          <ion-item>
+            <ion-label>
+              <h3><strong>Periodo / Mes:</strong></h3>
+              <p>{{ gasto.mes }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>
+              <h3><strong>Monto Total:</strong></h3>
+              <p>${{ gasto.monto }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>
+              <h3><strong>Estado de Pago:</strong></h3>
+            </ion-label>
+            <ion-badge slot="end" [color]="gasto.estado === 'Pagado' ? 'success' : 'warning'">
+              {{ gasto.estado }}
+            </ion-badge>
+          </ion-item>
+        </ion-list>
+
+        <div class="ion-margin-top">
+          @if (gasto.estado === 'Pendiente') {
+            <ion-button
+              expand="block"
+              color="success"
+              (click)="marcarPagado()">
+              Marcar como Pagado
+            </ion-button>
+          }
+
+          <ion-button expand="block" fill="outline" class="ion-margin-top" (click)="volver()">
+            Volver al Inicio
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  } @else {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Gasto no encontrado</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>El registro solicitado no existe o fue eliminado.</p>
+        <ion-button expand="block" (click)="volver()" class="ion-margin-top">
+          Volver al Inicio
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  }
+
+</ion-content>
