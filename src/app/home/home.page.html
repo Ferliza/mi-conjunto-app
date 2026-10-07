@@ -1,125 +1,501 @@
-<ion-header>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary" class="header-toolbar">
+    <ion-title class="ion-text-center app-title">
+      <ion-icon name="business-outline" class="title-icon"></ion-icon>
+      {{ nombreCondominio }}
+    </ion-title>
+  </ion-toolbar>
+
+  <!-- PESTAÑAS Y MENÚ DE NAVEGACIÓN -->
   <ion-toolbar color="primary">
-    <ion-title>Mi Conjunto</ion-title>
+    <ion-segment [(ngModel)]="segmentoSeleccionado" value="inicio" mode="md">
+      <ion-segment-button value="inicio">
+        <ion-icon name="grid-outline"></ion-icon>
+        <ion-label>Inicio</ion-label>
+      </ion-segment-button>
+
+      <ion-segment-button value="casas">
+        <ion-icon name="home-outline"></ion-icon>
+        <ion-label>Casas ({{ casas.length }})</ion-label>
+      </ion-segment-button>
+
+      <ion-segment-button value="gastos">
+        <ion-icon name="cash-outline"></ion-icon>
+        <ion-label>Gastos</ion-label>
+      </ion-segment-button>
+
+      <ion-segment-button value="anuncios">
+        <ion-icon name="megaphone-outline"></ion-icon>
+        <ion-label>Anuncios</ion-label>
+      </ion-segment-button>
+
+      <ion-segment-button value="contacto">
+        <ion-icon name="chatbox-ellipses-outline"></ion-icon>
+        <ion-label>Contacto</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="main-container">
 
-  <!-- Anuncios del Comité -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>📢 Anuncios del Comité</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let anuncio of anuncios" lines="none">
-          <ion-label class="ion-text-wrap">
-            <h2><strong>{{ anuncio.titulo }}</strong></h2>
-            <p>{{ anuncio.descripcion }}</p>
+  <!-- ==================== MENÚ PRINCIPAL (INICIO) ==================== -->
+  <div *ngIf="segmentoSeleccionado === 'inicio'" class="animate-fade">
+
+    <!-- HERO BANNER BIENVENIDA -->
+    <div class="welcome-card">
+      <div class="welcome-badge">
+        <ion-icon name="shield-checkmark-outline"></ion-icon> Portal de Copropietarios
+      </div>
+      <h2>Bienvenido a {{ nombreCondominio }}</h2>
+      <p>Gestión transparente, comunicación directa y administración de viviendas en un solo lugar.</p>
+    </div>
+
+    <!-- TARJETAS DE CATEGORÍAS (CUADRÍCULA) -->
+    <div class="section-title">Categorías del Condominio</div>
+
+    <ion-grid class="grid-categories">
+      <ion-row>
+        <ion-col size="6">
+          <ion-card class="category-card" (click)="cambiarSeccion('casas')">
+            <div class="cat-icon bg-blue">
+              <ion-icon name="home-outline"></ion-icon>
+            </div>
+            <h3>Propiedades</h3>
+            <p>{{ casas.length }} casas en registro</p>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-card class="category-card" (click)="cambiarSeccion('gastos')">
+            <div class="cat-icon bg-green">
+              <ion-icon name="cash-outline"></ion-icon>
+            </div>
+            <h3>Gastos Comunes</h3>
+            <p>${{ totalGastos | number }} acumulado</p>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-card class="category-card" (click)="cambiarSeccion('anuncios')">
+            <div class="cat-icon bg-orange">
+              <ion-icon name="megaphone-outline"></ion-icon>
+            </div>
+            <h3>Anuncios</h3>
+            <p>{{ anuncios.length }} comunicados</p>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-card class="category-card" (click)="cambiarSeccion('contacto')">
+            <div class="cat-icon bg-purple">
+              <ion-icon name="chatbox-ellipses-outline"></ion-icon>
+            </div>
+            <h3>Contacto Directiva</h3>
+            <p>Escribe tu solicitud</p>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- ÚLTIMOS AVISOS DE LA DIRECTIVA -->
+    <ion-card class="custom-card">
+      <ion-card-header>
+        <ion-card-title class="card-header-title">
+          <ion-icon name="megaphone-outline" color="warning"></ion-icon>
+          Avisos Recientes de la Directiva
+        </ion-card-title>
+      </ion-card-header>
+      <ion-list lines="none">
+        <ion-item *ngFor="let anuncio of anuncios.slice(0,2)">
+          <ion-label>
+            <h3 class="font-bold">{{ anuncio.titulo }}</h3>
+            <p>{{ anuncio.contenido }}</p>
+            <span class="text-subtle">{{ anuncio.fecha }}</span>
           </ion-label>
         </ion-item>
       </ion-list>
-    </ion-card-content>
-  </ion-card>
+    </ion-card>
 
-  <!-- Formulario Reactivo: Registrar Nuevo Gasto -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>➕ Registrar Nuevo Gasto</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <form [formGroup]="gastoForm" (ngSubmit)="guardarGasto()">
+  </div>
 
-        <ion-item>
+  <!-- ==================== CATEGORÍA 1: CASAS ==================== -->
+  <div *ngIf="segmentoSeleccionado === 'casas'" class="animate-fade">
+
+    <!-- TARJETA MÉTRICA RESUMEN -->
+    <div class="stat-card">
+      <div class="stat-icon-wrapper">
+        <ion-icon name="home-outline"></ion-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Copropietarios Registrados</span>
+        <h2 class="stat-value">{{ casas.length }} {{ casas.length === 1 ? 'Propiedad' : 'Propiedades' }}</h2>
+      </div>
+    </div>
+
+    <!-- FORMULARIO DE REGISTRO CON ESTILO OUTLINE -->
+    <ion-card class="custom-card">
+      <ion-card-header>
+        <ion-card-title class="card-header-title">
+          <ion-icon name="add-circle-outline" color="primary"></ion-icon>
+          Registrar Nueva Casa
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="casaForm" (ngSubmit)="guardarCasa()" class="form-grid">
+
           <ion-input
-            label="Departamento"
+            formControlName="direccion"
+            label="Dirección / N° Casa *"
             labelPlacement="floating"
-            formControlName="departamento"
-            placeholder="Ej: Depto 102">
+            fill="outline"
+            placeholder="Ej: Pasaje Los Olivos 103"
+            class="custom-input">
+            <ion-icon slot="start" name="home-outline" aria-hidden="true"></ion-icon>
           </ion-input>
-        </ion-item>
-        <div class="ion-padding-start" *ngIf="gastoForm.get('departamento')?.invalid && gastoForm.get('departamento')?.touched">
-          <ion-text color="danger">
-            <small *ngIf="gastoForm.get('departamento')?.errors?.['required']">El departamento es obligatorio.</small>
-            <small *ngIf="gastoForm.get('departamento')?.errors?.['minlength']">Debe ingresar al menos 3 caracteres.</small>
-          </ion-text>
-        </div>
 
-        <ion-item>
           <ion-input
-            label="Mes"
+            formControlName="propietario"
+            label="Nombre del Dueño *"
             labelPlacement="floating"
-            formControlName="mes"
-            placeholder="Ej: Noviembre">
+            fill="outline"
+            placeholder="Ej: Juan Pérez"
+            class="custom-input">
+            <ion-icon slot="start" name="person-outline" aria-hidden="true"></ion-icon>
           </ion-input>
-        </ion-item>
-        <div class="ion-padding-start" *ngIf="gastoForm.get('mes')?.invalid && gastoForm.get('mes')?.touched">
-          <ion-text color="danger">
-            <small *ngIf="gastoForm.get('mes')?.errors?.['required']">El mes es obligatorio.</small>
-          </ion-text>
-        </div>
 
-        <ion-item>
           <ion-input
-            label="Monto ($)"
-            type="number"
+            formControlName="rut"
+            label="RUT del Propietario"
             labelPlacement="floating"
-            formControlName="monto"
-            placeholder="Ej: 45000">
+            fill="outline"
+            placeholder="Ej: 12.345.678-9"
+            class="custom-input">
+            <ion-icon slot="start" name="card-outline" aria-hidden="true"></ion-icon>
           </ion-input>
-        </ion-item>
-        <div class="ion-padding-start" *ngIf="gastoForm.get('monto')?.invalid && gastoForm.get('monto')?.touched">
-          <ion-text color="danger">
-            <small *ngIf="gastoForm.get('monto')?.errors?.['required']">El monto es obligatorio.</small>
-            <small *ngIf="gastoForm.get('monto')?.errors?.['min']">El monto mínimo debe ser de $1.000.</small>
-          </ion-text>
-        </div>
 
-        <ion-button type="submit" expand="block" class="ion-margin-top">
-          Guardar Gasto
-        </ion-button>
-      </form>
-    </ion-card-content>
-  </ion-card>
+          <ion-input
+            formControlName="email"
+            type="email"
+            label="Correo Electrónico"
+            labelPlacement="floating"
+            fill="outline"
+            placeholder="Ej: juan.perez@email.com"
+            class="custom-input">
+            <ion-icon slot="start" name="mail-outline" aria-hidden="true"></ion-icon>
+          </ion-input>
 
-  <!-- Lista de Gastos Comunes -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>💸 Gastos Comunes</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let gasto of gastos">
+          <ion-input
+            formControlName="telefono"
+            type="tel"
+            label="Teléfono de Contacto"
+            labelPlacement="floating"
+            fill="outline"
+            placeholder="Ej: +56912345678"
+            class="custom-input">
+            <ion-icon slot="start" name="call-outline" aria-hidden="true"></ion-icon>
+          </ion-input>
+
+          <ion-button expand="block" type="submit" [disabled]="casaForm.invalid" class="submit-btn" color="primary">
+            Guardar Propiedad
+          </ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- BUSCADOR -->
+    <ion-searchbar
+      [(ngModel)]="filtroBusqueda"
+      placeholder="Buscar por casa, dueño o RUT..."
+      searchIcon="search-outline"
+      class="custom-searchbar">
+    </ion-searchbar>
+
+    <!-- DIRECTORIO DE CASAS -->
+    <ion-card class="custom-card">
+      <ion-card-header>
+        <ion-card-title class="card-header-title">
+          <ion-icon name="business-outline" color="primary"></ion-icon>
+          Directorio de Propiedades
+        </ion-card-title>
+      </ion-card-header>
+      <ion-list lines="full">
+        <ion-item *ngFor="let casa of casasFiltradas" class="directory-item">
+          <ion-avatar slot="start" class="house-avatar">
+            <ion-icon name="home-outline"></ion-icon>
+          </ion-avatar>
+
           <ion-label>
-            <h2><strong>{{ gasto.departamento }} — {{ gasto.mes }}</strong></h2>
-            <p>Monto: <strong>${{ gasto.monto }}</strong></p>
+            <h2 class="house-title">{{ casa.direccion }}</h2>
+            <p class="house-detail">
+              <ion-icon name="person-outline"></ion-icon>
+              {{ casa.propietario }}
+            </p>
+            <div class="house-chips">
+              <ion-chip *ngIf="casa.rut" color="medium" outline="true">
+                <ion-icon name="card-outline"></ion-icon>
+                <ion-label>{{ casa.rut }}</ion-label>
+              </ion-chip>
+              <ion-chip *ngIf="casa.email" color="tertiary" outline="true">
+                <ion-icon name="mail-outline"></ion-icon>
+                <ion-label>{{ casa.email }}</ion-label>
+              </ion-chip>
+              <ion-chip *ngIf="casa.telefono" color="success" outline="true">
+                <ion-icon name="call-outline"></ion-icon>
+                <ion-label>{{ casa.telefono }}</ion-label>
+              </ion-chip>
+            </div>
           </ion-label>
 
-          <ion-badge slot="end" [color]="gasto.estado === 'Pagado' ? 'success' : 'warning'">
+          <ion-button slot="end" color="danger" fill="clear" (click)="eliminarCasa(casa.id)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <ion-item *ngIf="casasFiltradas.length === 0" lines="none">
+          <ion-label class="ion-text-center empty-label">
+            No se encontraron casas registradas.
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card>
+
+  </div>
+
+  <!-- ==================== CATEGORÍA 2: GASTOS ==================== -->
+  <div *ngIf="segmentoSeleccionado === 'gastos'" class="animate-fade">
+
+    <!-- RESUMEN FINANCIERO -->
+    <div class="stat-card stat-card-success">
+      <div class="stat-icon-wrapper success">
+        <ion-icon name="cash-outline"></ion-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Monto Total Acumulado</span>
+        <h2 class="stat-value">${{ totalGastos | number }}</h2>
+      </div>
+    </div>
+
+    <!-- FORMULARIO GASTO COMÚN -->
+    <ion-card class="custom-card">
+      <ion-card-header>
+        <ion-card-title class="card-header-title">
+          <ion-icon name="add-circle-outline" color="success"></ion-icon>
+          Registrar Nuevo Gasto
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="gastoForm" (ngSubmit)="guardarGasto()" class="form-grid">
+
+          <ion-select
+            formControlName="departamento"
+            label="Seleccionar Propiedad *"
+            labelPlacement="floating"
+            fill="outline"
+            class="custom-input">
+            <ion-select-option *ngFor="let casa of casas" [value]="casa.direccion">
+              {{ casa.direccion }} — {{ casa.propietario }}
+            </ion-select-option>
+          </ion-select>
+
+          <ion-input
+            formControlName="mes"
+            label="Mes Correspondiente *"
+            labelPlacement="floating"
+            fill="outline"
+            placeholder="Ej: Octubre"
+            class="custom-input">
+            <ion-icon slot="start" name="time-outline" aria-hidden="true"></ion-icon>
+          </ion-input>
+
+          <ion-input
+            formControlName="monto"
+            type="number"
+            label="Monto ($) *"
+            labelPlacement="floating"
+            fill="outline"
+            placeholder="Ej: 50000"
+            class="custom-input">
+            <ion-icon slot="start" name="cash-outline" aria-hidden="true"></ion-icon>
+          </ion-input>
+
+          <ion-button expand="block" type="submit" [disabled]="gastoForm.invalid" class="submit-btn" color="success">
+            Guardar Gasto
+          </ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- LISTA DE GASTOS -->
+    <ion-card class="custom-card">
+      <ion-card-header>
+        <ion-card-title class="card-header-title">
+          <ion-icon name="cash-outline" color="success"></ion-icon>
+          Historial de Gastos
+        </ion-card-title>
+      </ion-card-header>
+      <ion-list lines="full">
+        <ion-item *ngFor="let gasto of gastos">
+          <ion-label>
+            <h2 class="house-title">{{ gasto.departamento }} — <span class="text-muted">{{ gasto.mes }}</span></h2>
+            <p class="gasto-monto">${{ gasto.monto | number }}</p>
+          </ion-label>
+
+          <ion-badge
+            [color]="gasto.estado === 'Pagado' ? 'success' : 'warning'"
+            slot="end"
+            (click)="toggleEstadoGasto(gasto)"
+            class="status-badge">
+            <ion-icon [name]="gasto.estado === 'Pagado' ? 'checkmark-circle-outline' : 'time-outline'"></ion-icon>
             {{ gasto.estado }}
           </ion-badge>
 
-          <!-- Botón Ver Detalle -->
-          <ion-button
-            slot="end"
-            fill="clear"
-            color="primary"
-            (click)="verDetalle(gasto.id)">
-            <ion-icon name="eye-outline" slot="icon-only"></ion-icon>
-          </ion-button>
-
-          <!-- Botón Eliminar -->
-          <ion-button
-            slot="end"
-            fill="clear"
-            color="danger"
-            (click)="confirmarEliminar(gasto.id, gasto.departamento)">
+          <ion-button slot="end" color="danger" fill="clear" (click)="eliminarGasto(gasto.id)">
             <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
           </ion-button>
         </ion-item>
       </ion-list>
-    </ion-card-content>
-  </ion-card>
+    </ion-card>
+
+  </div>
+
+  <!-- ==================== CATEGORÍA 3: ANUNCIOS ==================== -->
+  <div *ngIf="segmentoSeleccionado === 'anuncios'" class="animate-fade">
+    <ion-card *ngFor="let anuncio of anuncios" class="custom-card notice-card">
+      <ion-card-header>
+        <ion-card-subtitle class="notice-subtitle">
+          <ion-icon name="megaphone-outline"></ion-icon>
+          Comité de Administración — {{ anuncio.fecha }}
+        </ion-card-subtitle>
+        <ion-card-title class="notice-title">{{ anuncio.titulo }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="notice-content">
+        {{ anuncio.contenido }}
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- ==================== CATEGORÍA 4: CONTACTO DIRECTIVA ==================== -->
+  <div *ngIf="segmentoSeleccionado === 'contacto'" class="animate-fade">
+
+    <!-- INFORMACIÓN DE CONTACTO DIRECTIVA -->
+    <ion-card class="custom-card contact-info-card">
+      <ion-card-header>
+        <ion-card-title class="card-header-title">
+          <ion-icon name="location-outline" color="secondary"></ion-icon>
+          Administración {{ nombreCondominio }}
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="contact-text">Usa este formulario para enviar dudas, sugerencias o solicitudes a la directiva del condominio.</p>
+        <div class="contact-details">
+          <div><ion-icon name="mail-outline"></ion-icon> <strong>Email:</strong> directiva&#64;villalossauces2.cl</div>
+          <div><ion-icon name="time-outline"></ion-icon> <strong>Atención:</strong> Lunes a Viernes (18:00 - 20:00 hrs)</div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- ALERTA MENSAJE ENVIADO -->
+    <div *ngIf="mensajeEnviado" class="success-alert animate-fade">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <div>
+        <strong>¡Mensaje Enviado!</strong>
+        <p>Tu solicitud fue recibida por la directiva y guardada localmente.</p>
+      </div>
+    </div>
+
+    <!-- FORMULARIO DE CONTACTO -->
+    <ion-card class="custom-card">
+      <ion-card-header>
+        <ion-card-title class="card-header-title">
+          <ion-icon name="paper-plane-outline" color="secondary"></ion-icon>
+          Enviar Mensaje
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="contactoForm" (ngSubmit)="enviarContacto()" class="form-grid">
+
+          <ion-input
+            formControlName="nombre"
+            label="Tu Nombre Completo *"
+            labelPlacement="floating"
+            fill="outline"
+            placeholder="Ej: Pedro Morales"
+            class="custom-input">
+            <ion-icon slot="start" name="person-outline" aria-hidden="true"></ion-icon>
+          </ion-input>
+
+          <ion-input
+            formControlName="email"
+            type="email"
+            label="Tu Correo Electrónico *"
+            labelPlacement="floating"
+            fill="outline"
+            placeholder="Ej: pedro.morales@gmail.com"
+            class="custom-input">
+            <ion-icon slot="start" name="mail-outline" aria-hidden="true"></ion-icon>
+          </ion-input>
+
+          <ion-input
+            formControlName="telefono"
+            type="tel"
+            label="Teléfono de Contacto"
+            labelPlacement="floating"
+            fill="outline"
+            placeholder="Ej: +56998765432"
+            class="custom-input">
+            <ion-icon slot="start" name="call-outline" aria-hidden="true"></ion-icon>
+          </ion-input>
+
+          <ion-select
+            formControlName="asunto"
+            label="Motivo / Asunto *"
+            labelPlacement="floating"
+            fill="outline"
+            class="custom-input">
+            <ion-select-option value="consulta">Consulta General</ion-select-option>
+            <ion-select-option value="gastos">Duda sobre Gastos Comunes</ion-select-option>
+            <ion-select-option value="reclamo">Reclamo / Convivencia</ion-select-option>
+            <ion-select-option value="certificado">Solicitud de Certificado</ion-select-option>
+          </ion-select>
+
+          <ion-textarea
+            formControlName="mensaje"
+            label="Mensaje o Solicitud *"
+            labelPlacement="floating"
+            fill="outline"
+            [rows]="4"
+            placeholder="Escribe detalladamente tu mensaje para la directiva..."
+            class="custom-input">
+          </ion-textarea>
+
+          <ion-button expand="block" type="submit" [disabled]="contactoForm.invalid" class="submit-btn" color="secondary">
+            <ion-icon slot="start" name="send-outline"></ion-icon>
+            Enviar Mensaje
+          </ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- REGISTRO LOCAL DE MENSAJES ENVIADOS -->
+    <ion-card class="custom-card" *ngIf="mensajesEnviadosList.length > 0">
+      <ion-card-header>
+        <ion-card-title class="card-header-title">
+          <ion-icon name="chatbox-ellipses-outline" color="secondary"></ion-icon>
+          Historial de Solicitudes Enviadas
+        </ion-card-title>
+      </ion-card-header>
+      <ion-list lines="full">
+        <ion-item *ngFor="let msg of mensajesEnviadosList">
+          <ion-label>
+            <h2 class="house-title">[{{ msg.asunto | uppercase }}] — {{ msg.nombre }}</h2>
+            <p class="notice-content">{{ msg.mensaje }}</p>
+            <span class="text-subtle">Fecha: {{ msg.fecha }} | Contacto: {{ msg.email }}</span>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card>
+
+  </div>
 
 </ion-content>
